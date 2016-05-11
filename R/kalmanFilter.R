@@ -34,5 +34,5 @@ kfilter <- function(yt, Z, A, R, H, Q, a1, P1) {
     Pt[, , t+1] <- A %*% Ptt[, , t] %*% t(A) + R %*% Q %*% t(R)
   }
 
-  return(list(filtered.mean = at, filtered.variance = Pt))
+  return(list(filtered.mean = att, filtered.variance = Ptt))
 }
