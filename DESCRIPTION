@@ -1,9 +1,13 @@
 Package: dkss
 Type: Package
-Title: What the Package Does (Title Case)
+Title: State-Space Models Following Durbin & Koopman
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Christian Haug-Johansen
+Maintainer: Christian Haug-Johansen <christian.hj@gmail.com>
+Description: A package built for self-study purposes and which roughly follows
+    the textbook "Time Series Analysis by State Space Methods" by Durbin & Koopman.
+    There are several other more fully-featured packages on CRAN which compete in
+    this space and you should probably use them instead at this time.
+License: GPL (>= 2)
 LazyData: TRUE
+RoxygenNote: 5.0.1
