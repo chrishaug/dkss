@@ -1,10 +1,13 @@
-# Computes standard Kalman filter for linear, time-homogeneous Gaussian state space model, with initial state distribution known
-# Notation is from D&K (see section 4.3), with A_t replacing T_t, and indices dropped for time-homogeneous version, like this:
-#
-# y_t = Z\alpha_t + \varepsilon_t, \varepsilon_t \sim N(0, H)
-# \alpha_{t+1} = A\alpha_t + R\eta_t, \eta_t \sim N(0, Q)
-# \alpha_1 \sim N(a1, P1)
-
+#' Kalman filtering for linear Gaussian state-space model
+#'
+#' Applies classic Kalman filter algorithm to specified model, assuming that the parameters of the
+#' initial distribution are known.
+#'
+#' @return  An object of class lgss.filtered which holds all the results of the algorithm.
+#'
+#' @param mod A linear Gaussian state space model as described by an object of class lgss.
+#'
+#' @export
 kfilter <- function(mod) {
   # Check that mod is indeed of type lgss
   if (!is.lgss(mod)) stop("This function requires an object of type 'lgss'")

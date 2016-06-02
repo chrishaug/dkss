@@ -1,5 +1,21 @@
-# An S3 class which represents the result of the Kalman filter for lgss object model
-
+#' The result of running the Kalman filter on an lgss object
+#'
+#' The results of the algorithm are defined in D&K as follows
+#' \deqn{(\alpha_t|y_1, ..., y_{t-1}) ~ N(at, Pt)}
+#' \deqn{(\alpha_t|y_1, ..., y_t) ~ N(att, Ptt)}
+#' \deqn{v_t = y_t - Z_t a_t}
+#' \deqn{(\v_t|y_1, ..., y_{t-1}) ~ N(0, Ft)}
+#'
+#' We store the time dimension as the last one in all cases.
+#'
+#' @param att Filtered mean, an (m x n) matrix
+#' @param Ptt Filtered variance, (m x m x n) array
+#' @param at Forecast mean, an (m x n) matrix
+#' @param Pt Forecast variance, (m x m x n) array
+#' @param vt One-step ahead forecast errors, (p x n) matrix
+#' @param Ft One-step ahead forecast variance, (p x p x n) array
+#'
+#' @export
 lgss.filtered <- function(att, Ptt, at, Pt, vt, Ft) {
   # Type checking
   stopifnot(is.matrix(att), is.matrix(at), is.matrix(vt))
