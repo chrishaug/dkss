@@ -8,6 +8,7 @@
 #'
 #' We store the time dimension as the last one in all cases.
 #'
+#' @param mod The model, as defined by an object of class lgss
 #' @param att Filtered mean, an (m x n) matrix
 #' @param Ptt Filtered variance, (m x m x n) array
 #' @param at Forecast mean, an (m x n) matrix
@@ -16,8 +17,9 @@
 #' @param Ft One-step ahead forecast variance, (p x p x n) array
 #'
 #' @export
-lgss.filtered <- function(att, Ptt, at, Pt, vt, Ft) {
+lgss.filtered <- function(mod, att, Ptt, at, Pt, vt, Ft) {
   # Type checking
+  stopifnot(is.lgss(mod))
   stopifnot(is.matrix(att), is.matrix(at), is.matrix(vt))
   stopifnot(is.array(Ptt), is.array(Pt), is.array(Ft))
   stopifnot(length(dim(Ptt))==3, length(dim(Pt))==3, length(dim(Ft))==3)
@@ -31,7 +33,7 @@ lgss.filtered <- function(att, Ptt, at, Pt, vt, Ft) {
   stopifnot(dim(Ptt) == c(m, m, n), dim(Pt) == c(m, m, n), dim(Ft) == c(p, p, n))
   stopifnot(nrow(at) == m, ncol(at) == n, ncol(vt) == n)
 
-  result <- list(att=att, Ptt=Ptt, at=at, Pt=Pt, vt=vt, Ft=Ft)
+  result <- list(mod=mod, att=att, Ptt=Ptt, at=at, Pt=Pt, vt=vt, Ft=Ft)
   class(result) <- "lgss.filtered"
 
   return(result)

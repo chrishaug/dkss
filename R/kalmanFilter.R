@@ -44,7 +44,7 @@ kfilter <- function(mod) {
     Pt[, , t+1] <- mod$A %*% Ptt[, , t] %*% t(mod$A) + mod$R %*% mod$Q %*% t(mod$R)
   }
 
-  filtered <- lgss.filtered(att, Ptt, at[, 1:n], Pt[, , 1:n], vt, Ft)
+  filtered <- lgss.filtered(mod, att, Ptt, at[, 1:n], Pt[, , 1:n], vt, Ft)
 
   return(filtered)
 }
