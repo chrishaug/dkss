@@ -19,6 +19,8 @@ ksmooth <- function(filt) {
   # Smoothed distribution
   alphat <- matrix(nrow = m, ncol = n)
   Vt <- array(dim = c(m, m, n))
+  epshatt <- matrix(nrow = p, ncol = n)
+  etahatt <- matrix(nrow = m, ncol = n)
 
   # Recursion quantities
   rt <- matrix(nrow = m, ncol = n+1)
@@ -36,12 +38,17 @@ ksmooth <- function(filt) {
     rt[, t] <- t(filt$mod$Z) %*% solve(filt$Ft[, , t]) %*% filt$vt[, t] + t(Lt) %*% rt[, t+1]
     Nt[, , t] <- t(filt$mod$Z) %*% solve(filt$Ft[, , t]) %*% filt$mod$Z + t(Lt) %*% Nt[, , t+1] %*% Lt
 
+    ut <- solve(filt$Ft[, , t]) %*% filt$vt[, t] - t(filt$mod$A %*% filt$Pt[, , t] %*% t(filt$mod$Z) %*% solve(filt$Ft[, , t])) %*% rt[, t]
+
+    epshatt[, t] <- filt$mod$H %*% ut
+    etahatt[, t] <- filt$mod$Q %*% t(filt$mod$R) %*% r[, t]
+
     # Smoothing step
     alphat[, t] <- filt$at[, t] + filt$Pt[, , t] %*% rt[, t]
     Vt[, , t] <- filt$Pt[, , t] - filt$Pt[, , t] %*% Nt[, , t] %*% filt$Pt[, , t]
   }
 
-  smoothed <- lgss.smoothed(filt, alphat, Vt)
+  smoothed <- lgss.smoothed(filt, alphat, Vt, epshatt, etahatt)
 
   return(smoothed)
 }
