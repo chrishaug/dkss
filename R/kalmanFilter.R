@@ -18,8 +18,8 @@ kfilter <- function(mod) {
   p <- ncol(mod$yt)
 
   # Forecast distribution
-  at <- matrix(nrow = m, ncol = n + 1)
-  Pt <- array(dim = c(m, m, n + 1))
+  at <- matrix(nrow = m, ncol = n)
+  Pt <- array(dim = c(m, m, n))
   vt <- matrix(nrow = p, ncol = n)
   Ft <- array(dim = c(p, p, n))
 
@@ -27,24 +27,27 @@ kfilter <- function(mod) {
   att <- matrix(nrow = m, ncol = n)
   Ptt <- array(dim = c(m, m, n))
 
-  # Initialization
-  at[, 1] <- mod$a1
-  Pt[, , 1] <- mod$P1
-
   for (t in 1:n) {
+    if (t == 1) {
+      # Initialization
+      at[, 1] <- mod$a1
+      Pt[, , 1] <- mod$P1
+    } else {
+      # Forecasting
+      at[, t] <- mod$A %*% att[, t-1]
+      Pt[, , t] <- mod$A %*% Ptt[, , t-1] %*% t(mod$A) + mod$R %*% mod$Q %*% t(mod$R)
+    }
+
+    # One-step ahead forecast errors
     vt[, t] <- mod$yt[t, ] - mod$Z %*% at[, t]
     Ft[, , t] <- mod$Z %*% Pt[, , t] %*% t(mod$Z) + mod$H
 
     # Filtering step
     att[, t] <- at[, t] + Pt[, , t] %*% t(mod$Z) %*% solve(Ft[, , t]) %*% vt[, t]
     Ptt[, , t] <- Pt[, , t] - Pt[, , t] %*% t(mod$Z) %*% solve(Ft[, , t]) %*% mod$Z %*% Pt[, , t]
-
-    # Forecasting step
-    at[, t+1] <- mod$A %*% att[, t]
-    Pt[, , t+1] <- mod$A %*% Ptt[, , t] %*% t(mod$A) + mod$R %*% mod$Q %*% t(mod$R)
   }
 
-  filtered <- lgss.filtered(mod, att, Ptt, at[, 1:n], Pt[, , 1:n], vt, Ft)
+  filtered <- lgss.filtered(mod, att, Ptt, at, Pt, vt, Ft)
 
   return(filtered)
 }
