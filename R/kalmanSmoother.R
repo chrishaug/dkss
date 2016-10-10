@@ -15,37 +15,37 @@ ksmooth <- function(filt) {
   m <- nrow(filt$att)
   n <- ncol(filt$att)
   p <- nrow(filt$vt)
+  r <- nrow(filt$mod$Q)
 
   # Smoothed distribution
   alphat <- matrix(nrow = m, ncol = n)
   Vt <- array(dim = c(m, m, n))
   epshatt <- matrix(nrow = p, ncol = n)
-  etahatt <- matrix(nrow = m, ncol = n)
+  etahatt <- matrix(nrow = r, ncol = n)
 
-  # Recursion quantities
+  # Recursion quantities (rt[i] == r_{i-1} because we need r_0, same for Nt)
   rt <- matrix(nrow = m, ncol = n+1)
-  Nt <- array(dim = c(m, p, n+1))
+  Nt <- array(dim = c(m, m, n+1))
 
   # Initialization (from the end)
-  alphat[, n] <- filt$att[, n]
-  Vt[, , n] <- filt$Ptt[, , n]
   rt[, n+1] <- rep(0, nrow(rt))
-  Nt[, , n+1] <- matrix(0, nrow = m, ncol = p)
+  Nt[, , n+1] <- matrix(0, nrow = m, ncol = m)
 
   for (t in seq(n, 1)) {
     Lt <- filt$mod$A - filt$mod$A %*% filt$Pt[, , t] %*% t(filt$mod$Z) %*% solve(filt$Ft[, , t]) %*% filt$mod$Z
 
-    rt[, t] <- t(filt$mod$Z) %*% solve(filt$Ft[, , t]) %*% filt$vt[, t] + t(Lt) %*% rt[, t+1]
-    Nt[, , t] <- t(filt$mod$Z) %*% solve(filt$Ft[, , t]) %*% filt$mod$Z + t(Lt) %*% Nt[, , t+1] %*% Lt
+    # Smoothing step
+    rt[, t] <- t(filt$mod$Z) %*% solve(filt$Ft[, , t]) %*% filt$vt[, t] + t(Lt) %*% rt[, t + 1]
+    Nt[, , t] <- t(filt$mod$Z) %*% solve(filt$Ft[, , t]) %*% filt$mod$Z + t(Lt) %*% Nt[, , t + 1] %*% Lt
 
+    alphat[, t] <- filt$at[, t] + filt$Pt[, , t] %*% rt[, t]
+    Vt[, , t] <- filt$Pt[, , t] - filt$Pt[, , t] %*% Nt[, , t] %*% filt$Pt[, , t]
+
+    # Smoothed disturbances
     ut <- solve(filt$Ft[, , t]) %*% filt$vt[, t] - t(filt$mod$A %*% filt$Pt[, , t] %*% t(filt$mod$Z) %*% solve(filt$Ft[, , t])) %*% rt[, t]
 
     epshatt[, t] <- filt$mod$H %*% ut
-    etahatt[, t] <- filt$mod$Q %*% t(filt$mod$R) %*% r[, t]
-
-    # Smoothing step
-    alphat[, t] <- filt$at[, t] + filt$Pt[, , t] %*% rt[, t]
-    Vt[, , t] <- filt$Pt[, , t] - filt$Pt[, , t] %*% Nt[, , t] %*% filt$Pt[, , t]
+    etahatt[, t] <- filt$mod$Q %*% t(filt$mod$R) %*% rt[, t + 1]
   }
 
   smoothed <- lgss.smoothed(filt, alphat, Vt, epshatt, etahatt)
