@@ -30,6 +30,24 @@ lgss.smoothed <- function(filt, alphat, Vt) {
   return(result)
 }
 
+#' Checks whether an object is of class lgss.smoothed
+#' @param x The object to be tested
+#'
+#' @export
 is.lgss.smoothed <- function(x) {
   return(inherits(x, "lgss.smoothed"))
+}
+
+#' @export
+plot.lgss.smoothed <- function(x, y, ...) {
+  vert <- floor(sqrt(nrow(x$alphat)))
+  horz <- ceiling(nrow(x$alphat)/vert)
+
+  graphics::par(mfrow=c(vert,horz))
+  for (i in 1:nrow(x$alphat)) {
+    sds <- apply(x$Vt,3,function(P) sqrt(P[i,i]))
+    dat <- cbind(x$alphat[i,], x$alphat[i,]-1.96*sds, x$alphat[i,]+1.96*sds)
+    graphics::matplot(dat, col="blue", lty=c(1,2,2),type="l",ylab = "hat{alpha}",xlab="t")
+  }
+  graphics::par(mfrow=c(1,1))
 }

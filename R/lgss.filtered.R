@@ -39,11 +39,29 @@ lgss.filtered <- function(mod, att, Ptt, at, Pt, vt, Ft) {
   return(result)
 }
 
+#' Checks whether an object is of class lgss.filtered
+#' @param x The object to be tested
+#'
+#' @export
 is.lgss.filtered <- function(x) {
   return(inherits(x, "lgss.filtered"))
 }
 
-residuals.lgss.filtered <- function(filtered) {
-  # Standardize the residuals (is this right?)
-  filtered$vt/apply(filtered$Ft, function(x) sqrt(diag(x)))
+#' @export
+residuals.lgss.filtered <- function(object, ...) {
+  object$vt
+}
+
+#' @export
+plot.lgss.filtered <- function(x, y, ...) {
+  vert <- floor(sqrt(nrow(x$att)))
+  horz <- ceiling(nrow(x$att)/vert)
+
+  graphics::par(mfrow=c(vert,horz))
+  for (i in 1:nrow(x$att)) {
+    sds <- apply(x$Ptt,3,function(P) sqrt(P[i,i]))
+    dat <- cbind(x$att[i,], x$att[i,]-1.96*sds, x$att[i,]+1.96*sds)
+    graphics::matplot(dat, col="red", lty=c(1,2,2),type="l",ylab = "alpha_{t|t}",xlab="t")
+  }
+  graphics::par(mfrow=c(1,1))
 }
