@@ -8,23 +8,29 @@
 #' @param filt The filtered model result, as defined by an object of class lgss.filtered
 #' @param alphat Smoothed mean, an (m x n) matrix
 #' @param Vt Smoothed variance, (m x m x n) array
+#' @param epshat Smoothed observation errors, (p x n) matrix
+#' @param etahat Smoothed state errors, (r x n) matrix
 #'
 #' @export
-lgss.smoothed <- function(filt, alphat, Vt) {
+lgss.smoothed <- function(filt, alphat, Vt, epshat, etahat) {
   # Type checking
   stopifnot(is.lgss.filtered(filt))
-  stopifnot(is.matrix(alphat))
+  stopifnot(is.matrix(alphat),is.matrix(epshat),is.matrix(etahat))
   stopifnot(is.array(Vt))
   stopifnot(length(dim(Vt))==3)
 
   # Check the sizes
   m <- nrow(alphat)
   n <- ncol(alphat)
+  p <- nrow(filt$vt)
+  r <- nrow(filt$mod$Q)
 
   # Check if all the dimensions are coherent
   stopifnot(dim(Vt) == c(m, m, n))
+  stopifnot(nrow(epshat) == p, nrow(etahat) == r)
+  stopifnot(ncol(epshat) == n, ncol(etahat) == n)
 
-  result <- list(filt=filt, alphat=alphat, Vt=Vt)
+  result <- list(filt=filt, alphat=alphat, Vt=Vt, epshat=epshat, etahat=etahat)
   class(result) <- "lgss.smoothed"
 
   return(result)
