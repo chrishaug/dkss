@@ -20,6 +20,7 @@ lgss <- function(yt, Z, A, R, H, Q, a1, P1) {
   yt <- as.matrix(yt)
   a1 <- as.matrix(a1)
   Q <- as.matrix(Q)
+  R <- as.matrix(R)
 
   # A few useful sizes
   m <- nrow(a1)
